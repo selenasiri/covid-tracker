@@ -1,15 +1,29 @@
 import { FormControl } from '@material-ui/core';
 import './App.css';
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {MenuItem, Select} from "@material-ui/core"
 
 function App() {
-const [countries, setCountries] = useState([
-  'USA', 'UK', 'India'
-]);
+const [countries, setCountries] = useState([]);
 
-// State = how to write a variable in React
-// https://disease.sh/docs/#/COVID-19%3A%20Worldometers/get_v3_covid_19_countries
+  useEffect(() => {
+
+    const getCountriesData = async () => {
+      await fetch ('https://disease.sh/v3/covid-19/countries')
+      .then((response) => response.json()) 
+      .then((data) => {
+        const countries = data.map((country) => (
+          {
+            name: country.country, // United States, United Kingdom
+            value: country.countryInfo.iso2, // UK, USA, FR
+          }
+        ));
+        setCountries(countries);
+      })
+    }
+
+    getCountriesData();
+  }, []); 
 
   return (
     <div className="app">
@@ -21,7 +35,7 @@ const [countries, setCountries] = useState([
 
             {
               countries.map((country) => (
-                <MenuItem value={country}>{country}</MenuItem>
+                <MenuItem value={country.value}>{country.name}</MenuItem>
               ))
             }
           </Select>
